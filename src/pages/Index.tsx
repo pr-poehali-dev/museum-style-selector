@@ -29,6 +29,14 @@ const museums = [
     image: 'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/0a851476-2d06-4639-94a8-e569a11c7574.jpg',
     price: 450,
     category: 'Наука'
+  },
+  {
+    id: 4,
+    name: 'Художественная галерея',
+    description: 'Произведения классического и современного изобразительного искусства',
+    image: 'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/08e35c00-8b7a-426c-8366-025fa7c26fa9.jpg',
+    price: 550,
+    category: 'Живопись'
   }
 ];
 
