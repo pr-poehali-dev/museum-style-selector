@@ -41,6 +41,7 @@ export default function Index() {
   const [selectedMuseum, setSelectedMuseum] = useState<number | null>(null);
   const [date, setDate] = useState<Date>();
   const [ticketCount, setTicketCount] = useState(1);
+  const [heroImageIndex, setHeroImageIndex] = useState(0);
 
   const selectedMuseumData = museums.find(m => m.id === selectedMuseum);
   const totalPrice = selectedMuseumData ? selectedMuseumData.price * ticketCount : 0;
@@ -62,12 +63,44 @@ export default function Index() {
 
       <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center transition-all duration-700"
           style={{
-            backgroundImage: `url(${museums[0].image})`,
+            backgroundImage: `url(${museums[heroImageIndex].image})`,
             filter: 'brightness(0.4)'
           }}
         />
+        
+        <button
+          onClick={() => setHeroImageIndex((prev) => (prev - 1 + museums.length) % museums.length)}
+          className="absolute left-4 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all"
+          aria-label="Предыдущее фото"
+        >
+          <Icon name="ChevronLeft" size={32} />
+        </button>
+        
+        <button
+          onClick={() => setHeroImageIndex((prev) => (prev + 1) % museums.length)}
+          className="absolute right-4 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all"
+          aria-label="Следующее фото"
+        >
+          <Icon name="ChevronRight" size={32} />
+        </button>
+        
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          {museums.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setHeroImageIndex(index)}
+              className={`w-3 h-3 rounded-full transition-all ${
+                index === heroImageIndex 
+                  ? 'bg-white w-8' 
+                  : 'bg-white/50 hover:bg-white/70'
+              }`}
+              aria-label={`Фото ${index + 1}`}
+            />
+          ))}
+        </div>
+
         <div className="relative z-10 text-center text-white px-4 animate-fade-in">
           <h1 className="text-5xl md:text-7xl font-bold mb-6">Откройте мир культуры</h1>
           <p className="text-xl md:text-2xl mb-8 text-gray-200">Выберите музей и начните ваше путешествие</p>
