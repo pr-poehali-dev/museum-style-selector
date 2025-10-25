@@ -15,7 +15,11 @@ const museums = [
     id: 1,
     name: 'Музей современного искусства',
     description: 'Уникальная коллекция современного искусства и интерактивные инсталляции',
-    image: 'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/91a270d3-1185-489d-bbce-0e2a52ce896b.jpg',
+    images: [
+      'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/91a270d3-1185-489d-bbce-0e2a52ce896b.jpg',
+      'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/629ca2c2-81fd-419a-b2e4-63185088c637.jpg',
+      'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/0a851476-2d06-4639-94a8-e569a11c7574.jpg'
+    ],
     price: 500,
     category: 'Искусство'
   },
@@ -23,7 +27,11 @@ const museums = [
     id: 2,
     name: 'Исторический музей',
     description: 'Погрузитесь в историю через уникальные артефакты и экспозиции',
-    image: 'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/629ca2c2-81fd-419a-b2e4-63185088c637.jpg',
+    images: [
+      'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/629ca2c2-81fd-419a-b2e4-63185088c637.jpg',
+      'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/0a851476-2d06-4639-94a8-e569a11c7574.jpg',
+      'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/91a270d3-1185-489d-bbce-0e2a52ce896b.jpg'
+    ],
     price: 400,
     category: 'История'
   },
@@ -31,7 +39,11 @@ const museums = [
     id: 3,
     name: 'Музей науки и техники',
     description: 'Интерактивные экспонаты, демонстрации и научные эксперименты',
-    image: 'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/0a851476-2d06-4639-94a8-e569a11c7574.jpg',
+    images: [
+      'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/0a851476-2d06-4639-94a8-e569a11c7574.jpg',
+      'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/91a270d3-1185-489d-bbce-0e2a52ce896b.jpg',
+      'https://cdn.poehali.dev/projects/7e7c7725-c77f-4448-88a5-a4f85ace8939/files/629ca2c2-81fd-419a-b2e4-63185088c637.jpg'
+    ],
     price: 450,
     category: 'Наука'
   }
@@ -42,6 +54,7 @@ export default function Index() {
   const [date, setDate] = useState<Date>();
   const [ticketCount, setTicketCount] = useState(1);
   const [heroImageIndex, setHeroImageIndex] = useState(0);
+  const [cardImageIndex, setCardImageIndex] = useState<Record<number, number>>({});
 
   const selectedMuseumData = museums.find(m => m.id === selectedMuseum);
   const totalPrice = selectedMuseumData ? selectedMuseumData.price * ticketCount : 0;
@@ -65,7 +78,7 @@ export default function Index() {
         <div 
           className="absolute inset-0 bg-cover bg-center transition-all duration-700"
           style={{
-            backgroundImage: `url(${museums[heroImageIndex].image})`,
+            backgroundImage: `url(${museums[heroImageIndex].images[0]})`,
             filter: 'brightness(0.4)'
           }}
         />
@@ -124,19 +137,56 @@ export default function Index() {
             {museums.map((museum, index) => (
               <Card 
                 key={museum.id} 
-                className="overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 animate-scale-in cursor-pointer"
+                className="overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 animate-scale-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
-                onClick={() => {
-                  setSelectedMuseum(museum.id);
-                  document.getElementById('tickets')?.scrollIntoView({ behavior: 'smooth' });
-                }}
               >
-                <div className="h-64 overflow-hidden">
+                <div className="relative h-64 overflow-hidden group">
                   <img 
-                    src={museum.image} 
+                    src={museum.images[cardImageIndex[museum.id] || 0]} 
                     alt={museum.name}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
                   />
+                  
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCardImageIndex(prev => ({
+                        ...prev,
+                        [museum.id]: ((prev[museum.id] || 0) - 1 + museum.images.length) % museum.images.length
+                      }));
+                    }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10"
+                    aria-label="Предыдущее фото"
+                  >
+                    <Icon name="ChevronLeft" size={20} />
+                  </button>
+                  
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCardImageIndex(prev => ({
+                        ...prev,
+                        [museum.id]: ((prev[museum.id] || 0) + 1) % museum.images.length
+                      }));
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10"
+                    aria-label="Следующее фото"
+                  >
+                    <Icon name="ChevronRight" size={20} />
+                  </button>
+                  
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                    {museum.images.map((_, imgIndex) => (
+                      <div
+                        key={imgIndex}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          imgIndex === (cardImageIndex[museum.id] || 0)
+                            ? 'bg-white w-6'
+                            : 'bg-white/60'
+                        }`}
+                      />
+                    ))}
+                  </div>
                 </div>
                 <CardHeader>
                   <div className="flex items-start justify-between mb-2">
@@ -147,7 +197,14 @@ export default function Index() {
                   <CardDescription className="text-base">{museum.description}</CardDescription>
                 </CardHeader>
                 <CardFooter>
-                  <Button className="w-full" size="lg">
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => {
+                      setSelectedMuseum(museum.id);
+                      document.getElementById('tickets')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  >
                     Выбрать музей
                     <Icon name="ArrowRight" size={20} className="ml-2" />
                   </Button>
